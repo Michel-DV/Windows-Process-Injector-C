@@ -32,7 +32,7 @@ Find its PID (via Task Manager or tasklist).
 
 Run the injector:
 
-Bash: injector.exe <PID>
+Bash: injector.exe PID
 
 ⚠️ Legal Disclaimer
 FOR EDUCATIONAL AND RESEARCH PURPOSES ONLY.
