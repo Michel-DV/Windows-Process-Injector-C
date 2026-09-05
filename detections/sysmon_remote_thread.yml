@@ -1,0 +1,29 @@
+title: Remote Thread Creation Observed
+id: 1f5e5bf5-00f4-48f5-9f5b-dc80266db9f5
+status: experimental
+description: |
+  Detects Sysmon CreateRemoteThread telemetry as a broad hunting signal for
+  process-injection behavior. This rule is intentionally generic and requires
+  environment-specific tuning before production use.
+references:
+  - https://attack.mitre.org/techniques/T1055/
+author: Michel-DV
+date: 2026-09-06
+logsource:
+  product: windows
+  category: create_remote_thread
+  definition: Requires Sysmon CreateRemoteThread telemetry (Event ID 8)
+detection:
+  selection:
+    EventID: 8
+  condition: selection
+falsepositives:
+  - Debuggers
+  - Security products
+  - Accessibility software
+  - Legitimate application instrumentation
+level: medium
+tags:
+  - attack.defense-evasion
+  - attack.privilege-escalation
+  - attack.t1055
