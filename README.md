@@ -1,54 +1,130 @@
-# Windows-Process-Injector-C
-Shellcode Injection using WinAPI. Educational research on memory manipulation and EDR evasion techniques.
-# Windows Process Injector PoC (WinAPI)
+# Windows Process Injection Research Lab
+
+A compact Windows research project for studying **classic remote-thread process injection** from a defender and malware-analysis perspective.
 
 ![Language](https://img.shields.io/badge/Language-C-blue)
 ![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?logo=windows)
-![Category](https://img.shields.io/badge/Category-Malware%20Analysis-red)
+![Focus](https://img.shields.io/badge/Focus-Detection%20%26%20Analysis-2ea44f)
+![MITRE ATT&CK](https://img.shields.io/badge/MITRE-T1055-red)
 
-## 🦠 Overview
-This repository contains a C implementation of the **Classic Code Injection** technique. It demonstrates how malware interacts with the Windows OS to hide malicious code inside legitimate processes (e.g., `notepad.exe`).
+> **Lab-only project.** Use this repository only in isolated systems you own or are explicitly authorized to test.
 
-Writing this injector is a fundamental exercise for **Malware Analysts** to understand the specific WinAPI calls used by threat actors, making it easier to identify them during Reverse Engineering and behavioral analysis.
+## Why this project exists
 
-## 🛠️ Technical Details
+Process injection is a common technique in malware, red-team tooling, and post-exploitation frameworks. Understanding its observable Windows API sequence helps defenders recognize it during reverse engineering, EDR investigations, and behavioral analysis.
 
-The injection process follows the standard 4-step pattern used by many malware families:
+This repository intentionally keeps the implementation small so the relationship between code and telemetry remains easy to inspect.
 
-1.  **OpenProcess:** Acquires a handle to the target process using the PID.
-2.  **VirtualAllocEx:** Allocates memory within the target process's address space.
-3.  **WriteProcessMemory:** Writes the shellcode (payload) into the allocated memory.
-4.  **CreateRemoteThread:** Creates a new thread in the target process to execute the payload.
-   
-💻 Compilation
-To compile this project, use MinGW or Visual Studio Command Prompt:
+## Technique at a glance
 
-Bash: gcc injector.c -o injector.exe
+The proof of concept demonstrates the classic sequence:
 
-🚀 Usage
-Open a dummy process (e.g., Notepad).
+1. obtain a handle to a target process;
+2. allocate memory in the remote process;
+3. copy a demonstration payload into that memory;
+4. create a thread whose start address points to the remote allocation.
 
-Find its PID (via Task Manager or tasklist).
+The relevant Windows APIs are:
 
-Run the injector:
+- `OpenProcess`
+- `VirtualAllocEx`
+- `WriteProcessMemory`
+- `CreateRemoteThread`
 
-Bash: injector.exe PID
+This behavior maps to **MITRE ATT&CK T1055 — Process Injection**.
 
-⚠️ Legal Disclaimer
-FOR EDUCATIONAL AND RESEARCH PURPOSES ONLY.
+## Repository layout
 
-This code is provided to help security professionals understand memory injection techniques to improve detection capabilities (EDR testing).
+```text
+.
+├── injector.c                 # Original educational PoC
+├── detections/
+│   ├── README.md              # Defender telemetry and triage notes
+│   └── sysmon_remote_thread.yml
+├── .github/workflows/ci.yml   # Windows compile/static build check
+├── SECURITY.md
+├── LICENSE
+└── README.md
+```
 
-Do not use against systems you do not own.
+## Defensive learning goals
 
-The author assumes no liability for misuse.
+Use the project to practice:
 
-Project developed as part of the Advanced Cybersecurity Portfolio.
+- recognizing the API chain associated with remote-thread injection;
+- correlating process access, memory manipulation, and remote-thread telemetry;
+- mapping observed behavior to ATT&CK;
+- comparing source-level behavior with EDR/Sysmon evidence;
+- writing detection hypotheses that are specific enough to investigate without assuming every remote thread is malicious.
+
+## Suggested isolated lab
+
+A safe analysis workflow is:
 
 ```mermaid
-graph TD
-    A[Injector.exe] -->|1. Open Handle| B(Target Process / PID)
-    A -->|2. Allocate Memory| B
-    A -->|3. Copy Shellcode| B
-    A -->|4. Start Thread| B
-    B -->|Executes| C[Malicious Payload]
+graph LR
+    A[Disposable Windows VM] --> B[PoC source review]
+    B --> C[Compile in VM]
+    C --> D[Observe telemetry]
+    D --> E[Sysmon / EDR events]
+    E --> F[Detection & triage notes]
+```
+
+Recommended controls:
+
+- use a disposable Windows VM or sandbox;
+- keep the test target local to the VM;
+- do not expose the lab to production networks;
+- snapshot the VM before testing;
+- collect telemetry with Sysmon, Windows Event Logs, or your EDR;
+- treat the PoC as a behavior generator, not as an operational tool.
+
+## Detection perspective
+
+No single API call proves malicious activity. A stronger investigation signal comes from **correlation**.
+
+Examples of useful questions:
+
+- Did one process obtain high-privilege access to an unrelated process?
+- Was a remote thread created shortly afterward?
+- Is the source process unusual for the target process?
+- Does the thread start address resolve to a loaded image or to private memory?
+- Is the process relationship expected for the host and user session?
+
+The `detections/` directory contains a starter Sysmon-oriented rule and triage notes.
+
+## Build check
+
+The GitHub Actions workflow performs a Windows compilation check with MSVC using warning level 4. It does **not** execute the proof of concept.
+
+For local research, compile only inside your authorized Windows lab environment.
+
+## Scope and limitations
+
+This repository is intentionally narrow. It is **not** a complete injector framework and does not attempt to provide:
+
+- persistence;
+- privilege escalation;
+- credential access;
+- network command-and-control;
+- evasion or bypass logic;
+- stealth features;
+- exploitation.
+
+The goal is to make one well-known Windows behavior easy to study and detect.
+
+## Responsible use
+
+This repository is intended for:
+
+- malware-analysis education;
+- blue-team detection engineering;
+- reverse-engineering practice;
+- controlled EDR/Sysmon testing;
+- authorized security research.
+
+Do not use it against systems you do not own or lack explicit permission to test.
+
+## License
+
+Distributed under the MIT License. See [LICENSE](LICENSE).
