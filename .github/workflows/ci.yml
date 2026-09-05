@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  compile-check:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up MSVC developer shell
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Compile with warnings enabled
+        shell: cmd
+        run: cl /nologo /W4 /c injector.c
