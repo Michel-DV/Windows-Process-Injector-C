@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1">
+      <stop offset="0" stop-color="#0b0f12"/>
+      <stop offset="1" stop-color="#111814"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1200" height="520" rx="24" fill="url(#bg)"/>
+  <text x="56" y="70" fill="#f4f7f5" font-family="Segoe UI,Arial" font-size="30" font-weight="700">Classic Remote-Thread Injection — API Flow</text>
+  <text x="56" y="104" fill="#8ea098" font-family="Segoe UI,Arial" font-size="16">Legacy educational PoC • intentionally observable • Windows / C / WinAPI</text>
+
+  <g font-family="Segoe UI,Arial">
+    <rect x="58" y="176" width="190" height="118" rx="16" fill="#161f1b" stroke="#39ff88" stroke-width="2"/>
+    <text x="153" y="215" text-anchor="middle" fill="#39ff88" font-size="18" font-weight="700">1 · OpenProcess</text>
+    <text x="153" y="246" text-anchor="middle" fill="#dbe7e0" font-size="15">Acquire target handle</text>
+    <text x="153" y="271" text-anchor="middle" fill="#82958b" font-size="13">PROCESS_ALL_ACCESS</text>
+
+    <rect x="321" y="176" width="190" height="118" rx="16" fill="#161f1b" stroke="#39ff88" stroke-width="2"/>
+    <text x="416" y="215" text-anchor="middle" fill="#39ff88" font-size="18" font-weight="700">2 · VirtualAllocEx</text>
+    <text x="416" y="246" text-anchor="middle" fill="#dbe7e0" font-size="15">Allocate remote memory</text>
+    <text x="416" y="271" text-anchor="middle" fill="#82958b" font-size="13">RWX page in this PoC</text>
+
+    <rect x="584" y="176" width="190" height="118" rx="16" fill="#161f1b" stroke="#39ff88" stroke-width="2"/>
+    <text x="679" y="215" text-anchor="middle" fill="#39ff88" font-size="18" font-weight="700">3 · WriteProcessMemory</text>
+    <text x="679" y="246" text-anchor="middle" fill="#dbe7e0" font-size="15">Copy payload bytes</text>
+    <text x="679" y="271" text-anchor="middle" fill="#82958b" font-size="13">Cross-process memory write</text>
+
+    <rect x="847" y="176" width="286" height="118" rx="16" fill="#161f1b" stroke="#39ff88" stroke-width="2"/>
+    <text x="990" y="215" text-anchor="middle" fill="#39ff88" font-size="18" font-weight="700">4 · CreateRemoteThread</text>
+    <text x="990" y="246" text-anchor="middle" fill="#dbe7e0" font-size="15">Start execution in target</text>
+    <text x="990" y="271" text-anchor="middle" fill="#82958b" font-size="13">Thread entry points at remote buffer</text>
+
+    <g stroke="#39ff88" stroke-width="3" fill="none" filter="url(#glow)">
+      <path d="M248 235 H321"/><path d="M511 235 H584"/><path d="M774 235 H847"/>
+    </g>
+    <g fill="#39ff88">
+      <path d="M313 229 l12 6 -12 6z"/><path d="M576 229 l12 6 -12 6z"/><path d="M839 229 l12 6 -12 6z"/>
+    </g>
+
+    <rect x="58" y="348" width="1075" height="108" rx="16" fill="#0f1613" stroke="#26372f"/>
+    <text x="84" y="386" fill="#f0f5f2" font-size="17" font-weight="700">What defenders can observe</text>
+    <text x="84" y="416" fill="#9db0a6" font-size="15">process-handle access  •  remote virtual-memory allocation  •  cross-process write  •  remote-thread creation</text>
+    <text x="84" y="442" fill="#71847a" font-size="13">The sequence is more useful as correlated behavior than as four isolated API calls.</text>
+  </g>
+</svg>
