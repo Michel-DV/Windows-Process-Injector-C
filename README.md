@@ -234,6 +234,10 @@ Use this repository only on systems and processes you own or are explicitly auth
 
 The repository is maintained as a cybersecurity education and defensive-research artifact.
 
+## License
+
+Released under the [MIT License](LICENSE). See [SECURITY.md](SECURITY.md) for the project safety and reporting policy.
+
 ---
 
 <p align="center">
